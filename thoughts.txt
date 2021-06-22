@@ -1,0 +1,7 @@
+loan-->
+    loanId,memberId,amount,dateBorrowed,status
+
+    pay>>> 
+      logged in??--->payee id = memberid
+    or
+      anonymous??---> alert to select member id
