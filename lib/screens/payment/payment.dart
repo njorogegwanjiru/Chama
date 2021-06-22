@@ -33,6 +33,12 @@ class _MakePaymentState extends State<MakePayment> {
   String _memberName;
   String memberId;
 
+  final monthController = TextEditingController();
+
+  DateTime selectedDate = DateTime.now();
+
+  bool isMonthly = true;
+
   @override
   void initState() {
     super.initState();
@@ -52,6 +58,109 @@ class _MakePaymentState extends State<MakePayment> {
     super.dispose();
     paymentAmountController.dispose();
     transactionAmountController.dispose();
+    monthController.dispose();
+  }
+
+  Widget monthItem(String monthName) {
+    return InkWell(
+      onTap: () {
+        Navigator.pop(context);
+        monthController.value = TextEditingValue(
+            text: monthName + "_" + DateTime.now().year.toString());
+      },
+      child: Padding(
+        padding: EdgeInsets.all(8),
+        child: Container(
+          height: 30,
+          width: 70,
+          decoration: BoxDecoration(
+            color: Colors.orangeAccent,
+            borderRadius: BorderRadius.circular(3),
+          ),
+          child: Center(
+            child: Text(
+              monthName,
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  monthPicker() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Container(
+              height: 200,
+              width: MediaQuery.of(context).size.width,
+              child: Center(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        monthItem('Jan'),
+                        monthItem('Feb'),
+                        monthItem('Mar'),
+                      ],
+                    ),
+                    SizedBox(height: 5),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        monthItem('Apr'),
+                        monthItem('May'),
+                        monthItem('Jun'),
+                      ],
+                    ),
+                    SizedBox(height: 5),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        monthItem('Jul'),
+                        monthItem('Aug'),
+                        monthItem('Sept'),
+                      ],
+                    ),
+                    SizedBox(height: 5),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        monthItem('Oct'),
+                        monthItem('Nov'),
+                        monthItem('Dec')
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
+  }
+
+  Widget purposeButton(String label, Color bgColor, Color fontColor, function) {
+    return InkWell(
+      onTap: function,
+      child: Container(
+        height: 30,
+        width: MediaQuery.of(context).size.width / 3,
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(3),
+        ),
+        child: Center(
+          child: Text(
+            label,
+            style: TextStyle(color: fontColor),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -195,222 +304,314 @@ class _MakePaymentState extends State<MakePayment> {
                                       horizontal: 20,
                                       vertical: 3,
                                     ),
-                                    child: Row(
+                                    child: Column(
                                       children: [
-                                        Expanded(
-                                          flex: 2,
-                                          child: Form(
-                                            key: _formKey,
-                                            child: TextFormField(
-                                              controller:
-                                                  paymentAmountController,
-                                              onChanged: (value) {},
-                                              decoration: InputDecoration(
-                                                labelText: 'Amount Paid',
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: [
+                                            Text('For: '),
+                                            SizedBox(width: 5),
+                                            purposeButton(
+                                                "Monthly Contr",
+                                                isMonthly
+                                                    ? Colors.orangeAccent
+                                                    : Colors.grey.shade200,
+                                                isMonthly
+                                                    ? Colors.black
+                                                    : Colors.grey, () {
+                                              setState(() {
+                                                isMonthly = true;
+                                              });
+                                            }),
+                                            SizedBox(width: 8),
+                                            Text('or'),
+                                            SizedBox(width: 8),
+                                            purposeButton(
+                                                "Project Contr",
+                                                isMonthly
+                                                    ? Colors.grey.shade200
+                                                    : Colors.orangeAccent,
+                                                isMonthly
+                                                    ? Colors.grey
+                                                    : Colors.black, () {
+                                              setState(() {
+                                                isMonthly = false;
+                                              });
+                                            }),
+                                          ],
+                                        ),
+                                        Form(
+                                          key: _formKey,
+                                          child: Column(
+                                            children: [
+                                              TextFormField(
+                                                controller:
+                                                    paymentAmountController,
+                                                onChanged: (value) {},
+                                                decoration: InputDecoration(
+                                                  labelText: 'Amount Paid',
+                                                ),
+                                                validator: (value) {
+                                                  if (value.isEmpty) {
+                                                    return 'Enter Amount';
+                                                  }
+                                                  return null;
+                                                },
+                                                keyboardType: TextInputType
+                                                    .numberWithOptions(),
                                               ),
-                                              validator: (value) {
-                                                if (value.isEmpty) {
-                                                  return 'Enter Amount';
-                                                }
-                                                return null;
-                                              },
-                                              keyboardType: TextInputType
-                                                  .numberWithOptions(),
-                                            ),
+                                              isMonthly
+                                                  ? GestureDetector(
+                                                      onTap: monthPicker,
+                                                      child: AbsorbPointer(
+                                                        child: TextFormField(
+                                                          controller:
+                                                              monthController,
+                                                          onChanged: (value) {},
+                                                          decoration:
+                                                              InputDecoration(
+                                                            labelText: 'Month',
+                                                          ),
+                                                          validator: (value) {
+                                                            if (value.isEmpty) {
+                                                              return 'Enter Amount';
+                                                            }
+                                                            return null;
+                                                          },
+                                                          keyboardType:
+                                                              TextInputType
+                                                                  .numberWithOptions(),
+                                                        ),
+                                                      ),
+                                                    )
+                                                  : GestureDetector(
+                                                      onTap: () {
+                                                        showDialog(
+                                                            context: context,
+                                                            builder:
+                                                                (BuildContext
+                                                                    context) {
+                                                              return Container(
+                                                                height: 20,
+                                                                width: 80,
+                                                              );
+                                                            });
+                                                      },
+                                                      child: AbsorbPointer(
+                                                        child: TextFormField(
+                                                          controller:
+                                                              monthController,
+                                                          onChanged: (value) {},
+                                                          decoration:
+                                                              InputDecoration(
+                                                            labelText: 'Month',
+                                                          ),
+                                                          validator: (value) {
+                                                            if (value.isEmpty) {
+                                                              return 'Enter Amount';
+                                                            }
+                                                            return null;
+                                                          },
+                                                          keyboardType: TextInputType
+                                                              .numberWithOptions(),
+                                                        ),
+                                                      ),
+                                                    ),
+                                            ],
                                           ),
                                         ),
-                                        Expanded(
-                                          child: RaisedButton(
-                                            child: Text(
-                                              'Update',
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold,
-                                              ),
+                                        RaisedButton(
+                                          child: Text(
+                                            'Update',
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.bold,
                                             ),
-                                            onPressed: () {
-                                              FocusScope.of(context).unfocus();
-                                              setState(() {
-                                                newCashInAcc = cashInAcc +
-                                                    int.parse(
-                                                        paymentAmountController
-                                                            .text
-                                                            .toString());
-                                                newGrossContr = grossContr +
-                                                    int.parse(
-                                                        paymentAmountController
-                                                            .text
-                                                            .toString());
-                                                newNetContr = netContr +
-                                                    int.parse(
-                                                        paymentAmountController
-                                                            .text
-                                                            .toString());
-                                                newTotalWorth = totalWorth +
-                                                    int.parse(
-                                                        paymentAmountController
-                                                            .text
-                                                            .toString());
-                                              });
-                                              showDialog(
-                                                  context: context,
-                                                  builder:
-                                                      (BuildContext context) {
-                                                    return Container(
-                                                      child: AlertDialog(
-                                                        title: Text(
-                                                          'Confirmation',
-                                                          style: TextStyle(
-                                                            color: Colors.black,
-                                                            fontFamily:
-                                                                'SpecialElite',
-                                                          ),
+                                          ),
+                                          onPressed: () {
+                                            FocusScope.of(context).unfocus();
+                                            setState(() {
+                                              newCashInAcc = cashInAcc +
+                                                  int.parse(
+                                                      paymentAmountController
+                                                          .text
+                                                          .toString());
+                                              newGrossContr = grossContr +
+                                                  int.parse(
+                                                      paymentAmountController
+                                                          .text
+                                                          .toString());
+                                              newNetContr = netContr +
+                                                  int.parse(
+                                                      paymentAmountController
+                                                          .text
+                                                          .toString());
+                                              newTotalWorth = totalWorth +
+                                                  int.parse(
+                                                      paymentAmountController
+                                                          .text
+                                                          .toString());
+                                            });
+                                            showDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return Container(
+                                                    child: AlertDialog(
+                                                      title: Text(
+                                                        'Confirmation',
+                                                        style: TextStyle(
+                                                          color: Colors.black,
+                                                          fontFamily:
+                                                              'SpecialElite',
                                                         ),
-                                                        content: Container(
-                                                          height: 40,
-                                                          width: MediaQuery.of(
-                                                                  context)
-                                                              .size
-                                                              .width,
-                                                          child: Text(
-                                                              'Record payment of Ksh. ${int.parse(paymentAmountController.text.toString())}??👀'),
-                                                        ),
-                                                        actions: <Widget>[
-                                                          InkWell(
-                                                              onTap: () {
-                                                                Navigator.pop(
-                                                                    context);
-                                                              },
-                                                              child: Text(
-                                                                'Cancel',
-                                                                style: TextStyle(
-                                                                    color: Colors
-                                                                        .blue),
-                                                              )),
-                                                          SizedBox(
-                                                            width: 12,
-                                                          ),
-                                                          InkWell(
+                                                      ),
+                                                      content: Container(
+                                                        height: 40,
+                                                        width: MediaQuery.of(
+                                                                context)
+                                                            .size
+                                                            .width,
+                                                        child: Text(
+                                                            'Record payment of Ksh. ${int.parse(paymentAmountController.text.toString())}??👀'),
+                                                      ),
+                                                      actions: <Widget>[
+                                                        InkWell(
+                                                            onTap: () {
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
                                                             child: Text(
-                                                              'Confirm',
+                                                              'Cancel',
                                                               style: TextStyle(
                                                                   color: Colors
                                                                       .blue),
-                                                            ),
-                                                            onTap: () {
-                                                              API()
-                                                                  .updateDetails(
-                                                                      'Current Cash in Account',
-                                                                      'Gross Contributions',
-                                                                      'Net ContributionS',
-                                                                      'Total Worth',
-                                                                      newCashInAcc,
-                                                                      newGrossContr,
-                                                                      newNetContr,
-                                                                      newTotalWorth)
-                                                                  .catchError(
-                                                                      (error) {
-                                                                CoolAlert.show(
-                                                                  context:
-                                                                      context,
-                                                                  type:
-                                                                      CoolAlertType
-                                                                          .error,
-                                                                  text:
-                                                                      "$error",
-                                                                );
-                                                              }).then((value) {
-                                                                Navigator.pop(
-                                                                    context);
-                                                                API().recordPaymentAndTransaction(
-                                                                    " P&T_" +
-                                                                        DateTime.now()
-                                                                            .year
-                                                                            .toString() +
-                                                                        '_' +
-                                                                        DateTime.now()
-                                                                            .day
-                                                                            .toString() +
-                                                                        '_' +
-                                                                        DateTime.now()
-                                                                            .minute
-                                                                            .toString() +
-                                                                        '_' +
-                                                                        DateTime.now()
-                                                                            .second
-                                                                            .toString() +
-                                                                        '_' +
-                                                                        DateTime.now()
-                                                                            .millisecond
-                                                                            .toString(),
-                                                                    paymentAmountController
-                                                                        .text
-                                                                        .toString(),
-                                                                    "",
-                                                                    _memberName,
-                                                                    "Payment",
-                                                                    DateTime
-                                                                                .now()
-                                                                            .day
-                                                                            .toString() +
-                                                                        '/' +
-                                                                        DateTime.now()
-                                                                            .month
-                                                                            .toString() +
-                                                                        '/' +
-                                                                        DateTime.now()
-                                                                            .year
-                                                                            .toString() +
-                                                                        ' ' +
-                                                                        DateTime.now()
-                                                                            .hour
-                                                                            .toString()
-                                                                            .padLeft(2,
-                                                                                "0") +
-                                                                        ':' +
-                                                                        DateTime.now()
-                                                                            .minute
-                                                                            .toString()
-                                                                            .padLeft(2,
-                                                                                "0") +
-                                                                        ' ' +
-                                                                        'hrs');
-
-                                                                setState(() {
-                                                                  paymentAmountController
-                                                                      .text = '';
-                                                                  statistics = API()
-                                                                      .getStatistics();
-                                                                });
-                                                                CoolAlert.show(
-                                                                  backgroundColor:
-                                                                      Colors.orange[
-                                                                          100],
-                                                                  confirmBtnColor:
-                                                                      Color(
-                                                                          0xfff7892b),
-                                                                  context:
-                                                                      context,
-                                                                  type: CoolAlertType
-                                                                      .success,
-                                                                  text:
-                                                                      'Contribution Added!',
-                                                                );
-                                                              });
-                                                            },
+                                                            )),
+                                                        SizedBox(
+                                                          width: 12,
+                                                        ),
+                                                        InkWell(
+                                                          child: Text(
+                                                            'Confirm',
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .blue),
                                                           ),
-                                                        ],
-                                                      ),
-                                                    );
-                                                  });
-                                            },
-                                            color: Colors.orange,
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(12.0),
-                                                side: BorderSide(
-                                                    color: Colors.orange)),
-                                          ),
+                                                          onTap: () {
+                                                            API()
+                                                                .updateDetails(
+                                                                    'Current Cash in Account',
+                                                                    'Gross Contributions',
+                                                                    'Net ContributionS',
+                                                                    'Total Worth',
+                                                                    newCashInAcc,
+                                                                    newGrossContr,
+                                                                    newNetContr,
+                                                                    newTotalWorth)
+                                                                .catchError(
+                                                                    (error) {
+                                                              CoolAlert.show(
+                                                                context:
+                                                                    context,
+                                                                type:
+                                                                    CoolAlertType
+                                                                        .error,
+                                                                text: "$error",
+                                                              );
+                                                            }).then((value) {
+                                                              Navigator.pop(
+                                                                  context);
+                                                              API().recordPaymentAndTransaction(
+                                                                  " P&T_" +
+                                                                      DateTime.now()
+                                                                          .year
+                                                                          .toString() +
+                                                                      '_' +
+                                                                      DateTime.now()
+                                                                          .day
+                                                                          .toString() +
+                                                                      '_' +
+                                                                      DateTime.now()
+                                                                          .minute
+                                                                          .toString() +
+                                                                      '_' +
+                                                                      DateTime.now()
+                                                                          .second
+                                                                          .toString() +
+                                                                      '_' +
+                                                                      DateTime.now()
+                                                                          .millisecond
+                                                                          .toString(),
+                                                                  paymentAmountController
+                                                                      .text
+                                                                      .toString(),
+                                                                  "",
+                                                                  _memberName,
+                                                                  "Payment",
+                                                                  DateTime.now()
+                                                                          .day
+                                                                          .toString() +
+                                                                      '/' +
+                                                                      DateTime.now()
+                                                                          .month
+                                                                          .toString() +
+                                                                      '/' +
+                                                                      DateTime.now()
+                                                                          .year
+                                                                          .toString() +
+                                                                      ' ' +
+                                                                      DateTime.now()
+                                                                          .hour
+                                                                          .toString()
+                                                                          .padLeft(
+                                                                              2,
+                                                                              "0") +
+                                                                      ':' +
+                                                                      DateTime.now()
+                                                                          .minute
+                                                                          .toString()
+                                                                          .padLeft(
+                                                                              2,
+                                                                              "0") +
+                                                                      ' ' +
+                                                                      'hrs');
+
+                                                              setState(() {
+                                                                paymentAmountController
+                                                                    .text = '';
+                                                                statistics = API()
+                                                                    .getStatistics();
+                                                              });
+                                                              CoolAlert.show(
+                                                                backgroundColor:
+                                                                    Colors.orange[
+                                                                        100],
+                                                                confirmBtnColor:
+                                                                    Color(
+                                                                        0xfff7892b),
+                                                                context:
+                                                                    context,
+                                                                type:
+                                                                    CoolAlertType
+                                                                        .success,
+                                                                text:
+                                                                    'Contribution Added!',
+                                                              );
+                                                            });
+                                                          },
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                });
+                                          },
+                                          color: Colors.orange,
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12.0),
+                                              side: BorderSide(
+                                                  color: Colors.orange)),
                                         )
                                       ],
                                     ),
@@ -592,48 +793,46 @@ class _MakePaymentState extends State<MakePayment> {
                                                               radius: 10,
                                                               dotRadius: 4,
                                                             )
-                                                          :InkWell(
-                                                          onTap: () {
-                                                            Navigator.pop(
-                                                                context);
-                                                          },
-                                                          child: Text(
-                                                            'Cancel',
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .blue),
-                                                          )),
+                                                          : InkWell(
+                                                              onTap: () {
+                                                                Navigator.pop(
+                                                                    context);
+                                                              },
+                                                              child: Text(
+                                                                'Cancel',
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .blue),
+                                                              )),
                                                       SizedBox(
                                                         width: 12,
                                                       ),
                                                       InkWell(
                                                           onTap: () {
                                                             setState(() {
-                                                              loading =
-                                                              true;
+                                                              loading = true;
                                                             });
                                                             API()
                                                                 .updateDetails(
-                                                                'Current Cash in Account',
-                                                                'Transactions Costs',
-                                                                'Net ContributionS',
-                                                                'Total Worth',
-                                                                newCashInAcc,
-                                                                newSpentCash,
-                                                                newNetContr,
-                                                                newTotalWorth)
+                                                                    'Current Cash in Account',
+                                                                    'Transactions Costs',
+                                                                    'Net ContributionS',
+                                                                    'Total Worth',
+                                                                    newCashInAcc,
+                                                                    newSpentCash,
+                                                                    newNetContr,
+                                                                    newTotalWorth)
                                                                 .catchError(
                                                                     (error) {
-                                                                  CoolAlert
-                                                                      .show(
-                                                                    context:
+                                                              CoolAlert.show(
+                                                                context:
                                                                     context,
-                                                                    type: CoolAlertType
+                                                                type:
+                                                                    CoolAlertType
                                                                         .error,
-                                                                    text:
-                                                                    "$error",
-                                                                  );
-                                                                }).then((value) {
+                                                                text: "$error",
+                                                              );
+                                                            }).then((value) {
                                                               Navigator.pop(
                                                                   context);
                                                               API().recordPaymentAndTransaction(
@@ -665,7 +864,9 @@ class _MakePaymentState extends State<MakePayment> {
                                                                       .toString(),
                                                                   _memberName,
                                                                   "Transaction",
-                                                                  DateTime.now().day.toString() +
+                                                                  DateTime.now()
+                                                                          .day
+                                                                          .toString() +
                                                                       '/' +
                                                                       DateTime.now()
                                                                           .month
@@ -690,26 +891,24 @@ class _MakePaymentState extends State<MakePayment> {
                                                                 purposeController
                                                                     .text = '';
 
-                                                                statistics =
-                                                                    API()
-                                                                        .getStatistics();
-                                                                loading =
-                                                                false;
+                                                                statistics = API()
+                                                                    .getStatistics();
+                                                                loading = false;
                                                               });
-                                                              CoolAlert
-                                                                  .show(
+                                                              CoolAlert.show(
                                                                 backgroundColor:
-                                                                Colors.orange[
-                                                                100],
+                                                                    Colors.orange[
+                                                                        100],
                                                                 confirmBtnColor:
-                                                                Color(
-                                                                    0xfff7892b),
+                                                                    Color(
+                                                                        0xfff7892b),
                                                                 context:
-                                                                context,
-                                                                type: CoolAlertType
-                                                                    .success,
+                                                                    context,
+                                                                type:
+                                                                    CoolAlertType
+                                                                        .success,
                                                                 text:
-                                                                'Transaction Cost Updated!',
+                                                                    'Transaction Cost Updated!',
                                                               );
                                                             });
                                                           },
@@ -820,6 +1019,10 @@ class _MakePaymentState extends State<MakePayment> {
               },
             ),
           );
+  }
+
+  Widget showProjects() {
+    return Container();
   }
 
   refresh() {

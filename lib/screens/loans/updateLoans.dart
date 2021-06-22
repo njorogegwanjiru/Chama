@@ -162,7 +162,7 @@ class MyCustomFormState extends State<NewLoan> {
             // The validator receives the text that the user has entered.
             validator: (value) {
               if (value.isEmpty) {
-                return 'Error calculating intrest!';
+                return 'Error calculating interest!';
               }
               return null;
             },
