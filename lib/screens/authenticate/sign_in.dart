@@ -34,9 +34,10 @@ class _SignInState extends State<SignIn> {
     super.dispose();
   }
 
-  Widget _entryField(String title, TextEditingController controller, String err,
-      {bool isPassword = false}) {
+  Widget _entryField(String title, TextEditingController controller, String err,TextInputType type,{bool isPassword = false} ) {
     return TextFormField(
+        keyboardType: type,
+
         validator: (val) => val.isEmpty ? err : null,
         controller: controller,
         obscureText: isPassword,
@@ -238,14 +239,14 @@ class _SignInState extends State<SignIn> {
                                       child: Column(
                                         children: [
                                           _entryField("Email", emailController,
-                                              "Enter your email"),
+                                              "Enter your email",TextInputType.emailAddress),
                                           SizedBox(
                                             height: 12,
                                           ),
                                           _entryField(
                                               "Password",
                                               passwordController,
-                                              "Enter Password",
+                                              "Enter Password",TextInputType.numberWithOptions(),
                                               isPassword: true),
                                         ],
                                       )),

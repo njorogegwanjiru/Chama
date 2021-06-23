@@ -68,7 +68,7 @@ class _HomeState extends State<Home> {
 
     return WillPopScope(
       onWillPop: _onWillPop,
-      child: Scaffold(
+      child: Scaffold(backgroundColor: Colors.grey.shade100,
         appBar: AppBar(
           leading: IconButton(
             icon: CircleAvatar(
@@ -137,7 +137,9 @@ class _HomeState extends State<Home> {
             SafeArea(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [SizedBox(height: 10), Menus()],
+                children: [
+                  SizedBox(height: 10),
+                  Menus(),],
               ),
             ),
           ],
